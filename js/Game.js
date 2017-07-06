@@ -191,7 +191,7 @@ var reward =  [0,6,27,52,52,75,100,100,150,200];
 
 var lives =   [999999999,4,10, 6, 4, 4, 50, 27, 60, 30];
 
-var packChance = 400;
+var packChance = 600;
 var basePackVal = 10;
 var coinPackVal = 10;
 
@@ -592,7 +592,7 @@ TankGame.Game.prototype = {
   },
 
   render: function(){
-   //this.game.debug.text(this.game.time.fps, 100, 500, "#000");
+   this.game.debug.text(this.game.time.fps, 100, 500, "#000");
   },
 
   buy: function(player){
