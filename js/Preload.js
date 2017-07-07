@@ -112,6 +112,8 @@ TankGame.Preload.prototype = {
     this.load.image('music_off', 'assets/images/music_off.png');
     this.load.image('fullscreen_on', 'assets/images/fullscreen_on.png');
     this.load.image('fullscreen_off', 'assets/images/fullscreen_off.png');
+    this.load.image('obstacles_on', 'assets/images/obstacles_on.png');
+    this.load.image('obstacles_off', 'assets/images/obstacles_off.png');
 
     this.load.image('howtoplay_btn', 'assets/images/howtoplay.png');
     this.load.image('howtoplay_btn_hover', 'assets/images/howtoplay_hover.png');
@@ -149,6 +151,32 @@ TankGame.Preload.prototype = {
     this.load.image('swamp_tex', 'assets/images/swamp.png');
     this.load.image('city_tex', 'assets/images/city.png');
     this.load.image('grass_tex_selected', 'assets/images/grassSelected.png');
+
+    this.load.image('tree1', 'assets/images/tree1.png');
+    this.load.image('tree2', 'assets/images/tree2.png');
+    this.load.image('tree3', 'assets/images/tree3.png');
+    this.load.image('tree4', 'assets/images/tree4.png');
+    this.load.image('tree5', 'assets/images/tree5.png');
+
+    this.load.image('town1', 'assets/images/citystuff/town1.png');
+    this.load.image('town2', 'assets/images/citystuff/town2.png');
+    this.load.image('town3', 'assets/images/citystuff/town3.png');
+    this.load.image('town4', 'assets/images/citystuff/town4.png');
+    this.load.image('town5', 'assets/images/citystuff/town5.png');
+    this.load.image('town6', 'assets/images/citystuff/town6.png');
+    this.load.image('town7', 'assets/images/citystuff/town7.png');
+    this.load.image('town8', 'assets/images/citystuff/town8.png');
+    this.load.image('town9', 'assets/images/citystuff/town9.png');
+    this.load.image('town10', 'assets/images/citystuff/town10.png');
+    this.load.image('town11', 'assets/images/citystuff/town11.png');
+    this.load.image('town12', 'assets/images/citystuff/town12.png');
+    this.load.image('town13', 'assets/images/citystuff/town13.png');
+    this.load.image('town14', 'assets/images/citystuff/town14.png');
+
+    this.load.image('water', 'assets/images/water.png');
+    this.load.image('bridge', 'assets/images/bridge.png');
+    this.load.image('street', 'assets/images/street.png');
+    this.load.image('pathway', 'assets/images/pathway.png');
 
     this.load.image('dir_choise', 'assets/images/mineBtn.png');
 

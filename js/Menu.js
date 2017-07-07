@@ -123,7 +123,7 @@ TankGame.Menu.prototype = {
     }, this);
 
 
-    fullscreenbtn = this.game.add.button(160, 10, 'fullscreen_off', function(){
+    fullscreenbtn = this.game.add.button(210, 10, 'fullscreen_off', function(){
         this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
 
         if(this.game.scale.isFullScreen){
@@ -142,8 +142,26 @@ TankGame.Menu.prototype = {
     }
 
 
+    if(JSON.parse(localStorage.getItem("options")).obstacles==true){
+        obstaclesbtn = this.game.add.button(10, 10, 'obstacles_on', function(){
+            var options = localStorage.getItem('options');
+            options = JSON.parse(options);
+            options.obstacles=false;
+            localStorage.setItem("options",JSON.stringify(options));
+            this.state.start('Menu');
+        }, this);
+    }else{
+        obstaclesbtn = this.game.add.button(10, 10, 'obstacles_off', function(){
+            var options = localStorage.getItem('options');
+            options = JSON.parse(options);
+            options.obstacles=true;
+            localStorage.setItem("options",JSON.stringify(options));
+            this.state.start('Menu');
+        }, this);
+    }
+
     if(JSON.parse(localStorage.getItem("options")).particles==true){
-        particlesbtn = this.game.add.button(10, 10, 'particles_on', function(){
+        particlesbtn = this.game.add.button(60, 10, 'particles_on', function(){
             var options = localStorage.getItem('options');
             options = JSON.parse(options);
             options.particles=false;
@@ -151,7 +169,7 @@ TankGame.Menu.prototype = {
             this.state.start('Menu');
         }, this);
     }else{
-        particlesbtn = this.game.add.button(10, 10, 'particles_off', function(){
+        particlesbtn = this.game.add.button(60, 10, 'particles_off', function(){
             var options = localStorage.getItem('options');
             options = JSON.parse(options);
             options.particles=true;
@@ -161,7 +179,7 @@ TankGame.Menu.prototype = {
     }
     
     if(JSON.parse(localStorage.getItem("options")).sounds){
-        soundsbtn = this.game.add.button(60, 10, 'sounds_on', function(){
+        soundsbtn = this.game.add.button(110, 10, 'sounds_on', function(){
             var options = localStorage.getItem('options');
             options = JSON.parse(options);
             options.sounds=false;
@@ -169,7 +187,7 @@ TankGame.Menu.prototype = {
             this.state.start('Menu');
         }, this);
     }else{
-        soundsbtn = this.game.add.button(60, 10, 'sounds_off', function(){
+        soundsbtn = this.game.add.button(110, 10, 'sounds_off', function(){
             var options = localStorage.getItem('options');
             options = JSON.parse(options);
             options.sounds=true;
@@ -179,7 +197,7 @@ TankGame.Menu.prototype = {
     }
 
     if(JSON.parse(localStorage.getItem("options")).music){
-        musicbtn = this.game.add.button(110, 10, 'music_on', function(){
+        musicbtn = this.game.add.button(160, 10, 'music_on', function(){
             var options = localStorage.getItem('options');
             options = JSON.parse(options);
             options.music=false;
@@ -189,7 +207,7 @@ TankGame.Menu.prototype = {
             this.state.start('Menu');
         }, this);
     }else{
-       musicbtn = this.game.add.button(110, 10, 'music_off', function(){
+       musicbtn = this.game.add.button(160, 10, 'music_off', function(){
             var options = localStorage.getItem('options');
             options = JSON.parse(options);
             options.music=true;

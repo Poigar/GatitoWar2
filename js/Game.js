@@ -6,7 +6,18 @@ var base1;
 var base2;
 var biome;
 
-var defaultMoney = 50;
+var normalSpaces = 15*10;
+
+var maxObstacles = 20;
+var maxSeas = 4;
+var maxSeaSize = 100;
+var seaEntities=[];
+var seaAmount = 0;
+
+var bridges = [];
+var bridgeCount = 0;
+
+var defaultMoney = 200;
 var money1 = defaultMoney, money2 = defaultMoney;
 
 var gameIsOver = false;
@@ -18,6 +29,9 @@ var selectedEntity1=0, selectedEntity2=0;
 
 var cards1 = [];
 var cards2 = [];
+
+var obstacles = [];
+var obstacleCount = 0;
 
 var map = [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -73,7 +87,7 @@ var packMap = [
 var packs = [];
 var packIsAlive = [];
 var packCount = 0;
-var packRadius = 10;
+var packRadius = 15;
 7
 var mines = [];
 var mineIsAlive = [];
@@ -102,6 +116,13 @@ var shootInterval = [
   [1500,3500],//Lidmašīna
   [2000,3500],//Tanks
   [1500,3000],//Helikopters
+];
+
+var coo = [
+  {"x": 1, "y": 0},
+  {"x":-1, "y": 0},
+  {"x": 0, "y": 1},
+  {"x": 0, "y":-1}
 ];
 
 var coords = [ //virzieni (relatiivas koordinaatas), lai notiektu, kur shaut  ----  KAARTOT PEEC SVARIIGUMA (1. - vissvariigaakais)
@@ -181,19 +202,19 @@ var coords_sniper = [
 //.#+#+#.
 //#..#..#
 
-var bodyRadius =  [30, 15, 25, 15, 15, 15,  27,  28, 30, 28];
-var shootRadius = [ 0, 70,140, 70,  0,210, 100, 100,140, 140];
+var bodyRadius =  [30, 17, 25, 15, 15, 15,  27,  28, 30, 28];
+var shootRadius = [ 0, 50,140, 70,  0,210, 100, 100,140, 140];
 
 var shootPower=[0,1,3, 1,-1, 7, 13,  3, 15, 5];
 
 var cost =    [0,5,25,50,50,75,100,100,150,200];
-var reward =  [0,6,27,52,52,75,100,100,150,200];
+var reward =  [0,7,27,52,52,75,100,100,150,200];
 
 var lives =   [999999999,4,10, 6, 4, 4, 50, 27, 60, 30];
 
 var packChance = 600;
 var basePackVal = 10;
-var coinPackVal = 10;
+var coinPackVal = 20;
 
 
 var temp_explosion = [];
@@ -248,6 +269,7 @@ TankGame.Game.prototype = {
   create: function() {
 
       backgroundGroup = this.add.group();
+      overBgGroup = this.add.group();
       mineGroup = this.add.group();
       entityGroup = this.add.group();
       bulletGroup = this.add.group();
@@ -343,6 +365,166 @@ TankGame.Game.prototype = {
           }
           
         }
+      }
+
+      if( JSON.parse(localStorage.getItem("options")).obstacles ){
+
+        {
+          var amountOfSeas = rnd(1,maxSeas);
+          var thisSeaSize = rnd(8, maxSeaSize);
+          var sar = [];
+          var sarPos = 0;
+          for(var i = 0; i<amountOfSeas; i++){
+            var tmpY = rnd(0,9);
+            var tmpX = rnd(2,12);
+            sar.push( {"x":tmpX, "y":tmpY} ); 
+          }
+
+          while(sarPos<sar.length && seaAmount<thisSeaSize){
+            var sis = sar[sarPos];
+            sarPos++;
+
+            if( sis.x<2 || sis.x>11 || sis.y<0 || sis.y>9 ) continue;
+            if(map[sis.y][sis.x]!=0) continue;
+            
+            map[ sis.y ][ sis.x ] = -2;
+
+            if( biome!=5 ){
+              seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*sis.x, gameFieldY + 61*sis.y,'water');
+              backgroundGroup.add( seaEntities[ seaAmount ] );
+            } else {
+              seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*sis.x, gameFieldY + 61*sis.y,'pathway');
+              seaEntities[ seaAmount ].building = this.add.sprite( gameFieldX + 61*sis.x, gameFieldY + 61*sis.y,'town'+rnd(1,14));
+              backgroundGroup.add( seaEntities[ seaAmount ] );
+              overBgGroup.add( seaEntities[ seaAmount ].building );
+            }
+            
+            normalSpaces--;
+            seaAmount++;
+
+            for(var i = 0; i<4; i++){
+              if( rnd(1,4)<3 ) sar.push( {"x": sis.x+coo[i].x, "y": sis.y+coo[i].y} );
+            }
+
+          }
+
+        }
+
+          for(var i = 0; i<10; i++){
+            for(var j = 0; j<14; j++){
+              if( (map[i][j]==-1 || map[i][j]==-2) && (map[i][j+1]==-1 || map[i][j+1]==-2) ){
+                if(biome==5)
+                  seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j + 30, gameFieldY + 61*i,'pathway');
+                else
+                  seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j + 30, gameFieldY + 61*i,'water');
+                backgroundGroup.add( seaEntities[ seaAmount ] );
+                seaAmount++;
+              }
+            }
+          }
+          for(var i = 0; i<9; i++){
+            for(var j = 0; j<15; j++){
+              if( (map[i][j]==-1 || map[i][j]==-2) && (map[i+1][j]==-1 || map[i+1][j]==-2) ){
+                if(biome==5)
+                  seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j, gameFieldY + 61*i + 30,'pathway');
+                else
+                  seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j, gameFieldY + 61*i + 30,'water');
+                backgroundGroup.add( seaEntities[ seaAmount ] );
+                seaAmount++;
+              }
+            }
+          }
+          for(var i = 0; i<9; i++){
+            for(var j = 0; j<14; j++){
+              if( (map[i][j]==-1 || map[i][j]==-2) && (map[i+1][j]==-1 || map[i+1][j]==-2)  && (map[i][j+1]==-1 || map[i][j+1]==-2)  && (map[i+1][j+1]==-1 || map[i+1][j+1]==-2) ){
+                if(biome==5)
+                  seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j + 30, gameFieldY + 61*i + 30,'pathway');
+                else
+                  seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j + 30, gameFieldY + 61*i + 30,'water');
+                backgroundGroup.add( seaEntities[ seaAmount ] );
+                seaAmount++;
+              }
+            }
+          }
+
+          if(biome!=5)
+          for(var i = 0; i<10; i++){
+            for(var j = 0; j<15; j++){
+              if( map[i][j]==-2 ){
+                
+                var side = {"x":0,"y":0};
+                for(var ii = 0; ii<4; ii++){
+                  side.x = j+coo[ii].x;
+                  side.y = i+coo[ii].y;
+                  if(side.x>=0 && side.x<15 && side.y>=0 && side.y<10){
+                    if( map[side.y][side.x]!=-2 && map[side.y][side.x]!=-1 ){
+                      map[i][j] = -1;
+                      break;
+                    }
+                  }
+                }
+
+              }
+            }
+          
+          }
+
+
+        if( rnd(1,4)==1 ) this.generateBridge( rnd(2,12), rnd(0,9) );
+        
+        var connected = false;
+
+        while( !connected ){
+
+          for(var i = 0; i<10; i++){
+            for(var j = 0; j<15; j++){
+              altMap[i][j] = 0;
+            }
+          }
+
+          var sar = [];
+          var sarPos = 0;
+          for( var i = 0; i<10; i++ ){
+            sar.push( {"x": 1, "y": i} );
+            altMap[i][1] = 1;
+          }
+
+          while( sarPos < sar.length && !connected ){
+            var sis = sar[sarPos];
+            sarPos++;
+
+            for(var i = 0; i<3; i++){
+              var next = {"x": sis.x+coo[i].x, "y": sis.y+coo[i].y};
+              if(next.x>=0 && next.x<14 && next.y>=0 && next.y<10){
+                if( altMap[next.y][next.x]==0 && map[next.y][next.x]!=-2 && map[next.y][next.x]!=-1 ){
+                  sar.push( next );
+                  altMap[next.y][next.x] = 1;
+                }
+              } else if( next.x==14 ){
+                connected = true;
+                break;
+              }
+            } 
+          }
+
+          if( !connected ){
+            var bridgesss = rnd(1,3);
+            for(var i = 0; i<bridgesss; i++) this.generateBridge( rnd(2,12), rnd(0,9) );
+          }
+        }
+
+
+        /*var amountOfObstacles = rnd(1,maxObstacles);
+
+        for(var i = 0; i<amountOfObstacles; i++){
+          var tmpY = rnd(0,9);
+          var tmpX = rnd(2,12);
+          if( map[tmpY][tmpX]==0 ){
+            map[tmpY][tmpX] = -2;
+            obstacles[obstacleCount] = this.add.sprite( gameFieldX + 61*tmpX, gameFieldY + 61*tmpY,'tree'+biome);
+          }
+        }*/
+
       }
 
       if(biome==2 && JSON.parse(localStorage.getItem("options")).particles){
@@ -882,10 +1064,29 @@ TankGame.Game.prototype = {
     return ret;
   },
 
+  collideObstacles: function(x,y,N){
+    if(entities[N].flying==false && entities[N].kind!=4 && entities[N].kind!=6 && entities[N].kind!=8){
+      if( map[ coordToCellY(y) ][ coordToCellX(x) ]<0 ) return true;
+    } else if( entities[N].kind==4 ){
+      if( map[ coordToCellY(y) ][ coordToCellX(x) ]<-10 ) return true;
+    } else if( entities[N].kind==6 || entities[N].kind==8 ){
+      if( map[ coordToCellY(y) ][ coordToCellX(x) ]<0 && map[ coordToCellY(y) ][ coordToCellX(x) ]!=-1 ) return true;
+    }
+  },
+
   collideEntity: function(x,y,r,N){
     var ret = false;
 
     if( x-r<gameFieldX || x+r>gameFieldX+(61*15) || y-r<gameFieldY || y+r>gameFieldY+(61*10) ) return true;
+    
+
+
+    if( this.collideObstacles(x,y,N) ||
+        this.collideObstacles(x+r,y,N) ||
+        this.collideObstacles(x,y+r,N) ||
+        this.collideObstacles(x-r,y,N) ||
+        this.collideObstacles(x,y-r,N)  ) return true;
+
 
     var lastAlive = 0;
     for(var i = 0; i<entityCount; i+=0){
@@ -1659,6 +1860,35 @@ TankGame.Game.prototype = {
           this.firePlane(x,false);
         }
       }, this);
+    }
+  },
+
+  generateBridge: function(x,y){
+    if( map[y][x]!=-1 && map[y][x]!=-2 ) return;
+
+    var i = x;
+    while( map[y][i]==-1 || map[y][i]==-2 ){
+      map[y][i] = 1;
+      if( biome==5 )
+        bridges[bridgeCount] = this.game.add.sprite(gameFieldX+61*i+30,gameFieldY+61*y+30,'street');
+      else
+        bridges[bridgeCount] = this.game.add.sprite(gameFieldX+61*i+30,gameFieldY+61*y+30,'bridge');
+      bridges[bridgeCount].anchor.setTo(0.5);
+      overBgGroup.add(bridges[bridgeCount]);
+      bridgeCount++;
+      i++;
+    }
+    i = x-1;
+    while( map[y][i]==-1 || map[y][i]==-2 ){
+      map[y][i] = 1;
+      if( biome==5 )
+        bridges[bridgeCount] = this.game.add.sprite(gameFieldX+61*i+30,gameFieldY+61*y+30,'street');
+      else
+        bridges[bridgeCount] = this.game.add.sprite(gameFieldX+61*i+30,gameFieldY+61*y+30,'bridge');
+      bridges[bridgeCount].anchor.setTo(0.5);
+      overBgGroup.add(bridges[bridgeCount]);
+      bridgeCount++;
+      i--;
     }
   },
 
