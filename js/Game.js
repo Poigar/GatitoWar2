@@ -17,7 +17,7 @@ var seaAmount = 0;
 var bridges = [];
 var bridgeCount = 0;
 
-var defaultMoney = 10000000;
+var defaultMoney = 50;
 var money1 = defaultMoney, money2 = defaultMoney;
 
 var gameIsOver = false;
@@ -784,7 +784,7 @@ TankGame.Game.prototype = {
   },
 
   render: function(){
-   this.game.debug.text(this.game.time.fps, 100, 500, "#000");
+   //this.game.debug.text(this.game.time.fps, 100, 500, "#000");
   },
 
   buy: function(player){
