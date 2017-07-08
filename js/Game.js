@@ -17,7 +17,7 @@ var seaAmount = 0;
 var bridges = [];
 var bridgeCount = 0;
 
-var defaultMoney = 10000000;
+var defaultMoney = 50;
 var money1 = defaultMoney, money2 = defaultMoney;
 
 var gameIsOver = false;
@@ -784,14 +784,14 @@ TankGame.Game.prototype = {
   },
 
   render: function(){
-   this.game.debug.text(this.game.time.fps, 100, 500, "#000");
+   //this.game.debug.text(this.game.time.fps, 100, 500, "#000");
   },
 
   buy: function(player){
     if(!gameIsOver){
       if(player==1){
 
-        if( this.collidePoint(gameFieldX+61+30, gameFieldY+(61*selPos1)+30, bodyRadius[selectedEntity1] ) ) return;
+        if( selectedEntity1 != 7 && selectedEntity1 != 9 && this.collidePoint(gameFieldX+61+30, gameFieldY+(61*selPos1)+30, bodyRadius[selectedEntity1] ) ) return;
 
         money1 -= cost[selectedEntity1];
         this.refreshMoney();
@@ -857,7 +857,6 @@ TankGame.Game.prototype = {
           flyGroup.add( entities[entityCount] );
           entityIsAlive[entityCount] = true;
 
-          this.firePlane(entityCount,true);
         }
         if(selectedEntity1==8){
           entities[entityCount] = this.game.add.sprite(gameFieldX+61+30,gameFieldY+(61*selPos1)+30,'tank2_tex');
@@ -881,12 +880,13 @@ TankGame.Game.prototype = {
         entities[entityCount].kind = selectedEntity1;
         entities[entityCount].health = lives[selectedEntity1];
         entities[entityCount].team = 1;
+        if( selectedEntity1==7 ) this.firePlane(entityCount,true);
         selectedEntity1 = entityCount;
 
       }
       if(player==2){
 
-        if( this.collidePoint(gameFieldX+61*13+30, gameFieldY+(61*selPos2)+30, bodyRadius[selectedEntity2] ) ) return;
+        if( selectedEntity2 != 7 && selectedEntity2 != 9 && this.collidePoint(gameFieldX+61*13+30, gameFieldY+(61*selPos2)+30, bodyRadius[selectedEntity2] ) ) return;
 
         money2 -= cost[selectedEntity2];
         this.refreshMoney();
@@ -959,7 +959,7 @@ TankGame.Game.prototype = {
           entities[entityCount].manOnBoard = 1;
           flyGroup.add( entities[entityCount] );
           entityIsAlive[entityCount] = true;
-          this.firePlane(entityCount,true);
+        
         }
         if(selectedEntity2==8){
           entities[entityCount] = this.game.add.sprite(gameFieldX+61*13+30,gameFieldY+(61*selPos2)+30,'tank2_tex_blue');
@@ -983,6 +983,7 @@ TankGame.Game.prototype = {
         entities[entityCount].health = lives[selectedEntity2];
         entities[entityCount].team = 2;
         entities[entityCount].kind = selectedEntity2;
+        if( selectedEntity2==7 ) this.firePlane(entityCount,true);
         selectedEntity2 = entityCount;
 
       }
