@@ -33,6 +33,15 @@ var cards2 = [];
 var obstacles = [];
 var obstacleCount = 0;
 
+var regime = [
+  [],
+  [0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0]
+];
+
+var regimeCount = 2;
+var regimePressed = [false,false,false];
+
 var fncPressed1 = false;
 var fncPressed2 = false;
 
@@ -91,15 +100,16 @@ var packs = [];
 var packIsAlive = [];
 var packCount = 0;
 var packRadius = 15;
-7
+
 var mines = [];
 var mineIsAlive = [];
 var mineCount = 0;
-var minePower = 25;
-var mineRadius = 7;
-var mineBombRadius = 25;
+var minePower = 25.0;
+var mineRadius = 5;
+var mineBombRadius = 25.0;
 
-var planePower = 20;
+var planePower = 25;
+var planeRadius = 35;
 var planeInterval = [100, 1500];
 
 var spritesBase1 = [];
@@ -668,6 +678,15 @@ TankGame.Game.prototype = {
       cards2[9] = this.game.add.sprite(gameFieldX+(15*61)+12 ,395,'card9b');
       cards2[9].name = this.game.add.text(gameFieldX+(15*61)+12+marX,395+marY, 9 ,cardStyle);
 
+      for(var i = 1; i<10; i++){
+        if( i!=4 && i!=7 && i!=9 ){
+          cards1[i].icon = cards1[i].addChild( this.game.add.sprite(0,0,'fightIcon') );
+          //cards1[i].icon.anchor.setTo(0.5);
+          cards2[i].icon = cards2[i].addChild( this.game.add.sprite(0,0,'fightIcon') );
+          //cards2[i].icon.anchor.setTo(0.5);
+        }
+      }
+
     
     selectionSquare1 = this.game.add.sprite((gameFieldX+61),gameFieldY, 'grass_tex_selected');
     selectionSquare2 = this.game.add.sprite((gameFieldX+61*13),gameFieldY, 'grass_tex_selected');
@@ -791,7 +810,7 @@ TankGame.Game.prototype = {
     if(!gameIsOver){
       if(player==1){
 
-        if( this.collidePoint(gameFieldX+61+30, gameFieldY+(61*selPos1)+30, bodyRadius[selectedEntity1] ) ) return;
+        if( selectedEntity1 != 7 && selectedEntity1 != 9 && this.collidePoint(gameFieldX+61+30, gameFieldY+(61*selPos1)+30, bodyRadius[selectedEntity1] ) ) return;
 
         money1 -= cost[selectedEntity1];
         this.refreshMoney();
@@ -857,7 +876,6 @@ TankGame.Game.prototype = {
           flyGroup.add( entities[entityCount] );
           entityIsAlive[entityCount] = true;
 
-          this.firePlane(entityCount,true);
         }
         if(selectedEntity1==8){
           entities[entityCount] = this.game.add.sprite(gameFieldX+61+30,gameFieldY+(61*selPos1)+30,'tank2_tex');
@@ -876,17 +894,16 @@ TankGame.Game.prototype = {
           entities[entityCount].dest = -1;
         }
 
-        
-
         entities[entityCount].kind = selectedEntity1;
         entities[entityCount].health = lives[selectedEntity1];
         entities[entityCount].team = 1;
+        if( selectedEntity1==7 ) this.firePlane(entityCount,true);
         selectedEntity1 = entityCount;
 
       }
       if(player==2){
 
-        if( this.collidePoint(gameFieldX+61*13+30, gameFieldY+(61*selPos2)+30, bodyRadius[selectedEntity2] ) ) return;
+        if( selectedEntity2 != 7 && selectedEntity2 != 9 && this.collidePoint(gameFieldX+61*13+30, gameFieldY+(61*selPos2)+30, bodyRadius[selectedEntity2] ) ) return;
 
         money2 -= cost[selectedEntity2];
         this.refreshMoney();
@@ -896,7 +913,6 @@ TankGame.Game.prototype = {
           entities[entityCount] = this.game.add.sprite(gameFieldX+61*13+30,gameFieldY+(61*selPos2)+30,'gunman_walk_blue');
           var walk = entities[entityCount].animations.add('walk');
           entities[entityCount].animations.play('walk',7,true);
-          entities[entityCount].scale.setTo(-1,1);
           entities[entityCount].anchor.setTo(0.5);
           entityGroup.add( entities[entityCount] );
         }
@@ -904,7 +920,6 @@ TankGame.Game.prototype = {
 
           entities[entityCount] = this.game.add.sprite(gameFieldX+61*13+30,gameFieldY+(61*selPos2)+30,'pickup_tex_blue');
           var ride = entities[entityCount].animations.add('ride');
-          entities[entityCount].scale.setTo(-1,1);
           entities[entityCount].animations.play('ride',5,true);
           entities[entityCount].anchor.setTo(0.5);
           entityGroup.add( entities[entityCount] );
@@ -912,7 +927,6 @@ TankGame.Game.prototype = {
         if(selectedEntity2==3){
           entities[entityCount] = this.game.add.sprite(gameFieldX+61*13+30,gameFieldY+(61*selPos2)+30,'ninja_walk_blue');
           var walk = entities[entityCount].animations.add('walk');
-          entities[entityCount].scale.setTo(-1,1);
           entities[entityCount].animations.play('walk',12,true);
           entities[entityCount].anchor.setTo(0.5);
           entityGroup.add( entities[entityCount] );
@@ -922,15 +936,14 @@ TankGame.Game.prototype = {
 
           entities[entityCount] = this.game.add.sprite(gameFieldX+61*13+30,gameFieldY+(61*selPos2)+30,'minecat_blue');
           var minewalk = entities[entityCount].animations.add('minewalk');
-          entities[entityCount].scale.setTo(-1,1);
           entities[entityCount].animations.play('minewalk',7,true);
           entities[entityCount].anchor.setTo(0.5);
           entities[entityCount].littleMove = 0;
 
           dirSelection2 = true;
           dirSelectionEntity2 = this.game.add.sprite(gameFieldX+61*13+30,gameFieldY+(61*selPos2)+30,'dir_choise');
-          dirSelectionEntity2.anchor.setTo(0.25,0.5);
           dirSelectionEntity2.scale.setTo(-1,1);
+          dirSelectionEntity2.anchor.setTo(0.25,0.5);
 
           entityGroup.add( entities[entityCount] );
 
@@ -939,7 +952,6 @@ TankGame.Game.prototype = {
         if(selectedEntity2==5){
           entities[entityCount] = this.game.add.sprite(gameFieldX+61*13+30,gameFieldY+(61*selPos2)+30,'sniper_walk_blue');
           var walk = entities[entityCount].animations.add('walk');
-          entities[entityCount].scale.setTo(-1,1);
           entities[entityCount].animations.play('walk',3,true);
           entities[entityCount].anchor.setTo(0.5);
           entityGroup.add( entities[entityCount] );
@@ -947,24 +959,22 @@ TankGame.Game.prototype = {
         if(selectedEntity2==6){
           entities[entityCount] = this.game.add.sprite(gameFieldX+61*13+30,gameFieldY+(61*selPos2)+30,'tank_tex_blue');
           var ride = entities[entityCount].animations.add('ride');
-          entities[entityCount].scale.setTo(-1,1);
           entities[entityCount].animations.play('ride',10,true);
           entities[entityCount].anchor.setTo(0.5);
           entityGroup.add( entities[entityCount] );
         }
         if(selectedEntity2==7){
           entities[entityCount] = this.game.add.sprite(gameFieldX+61*13+30,gameFieldY+(61*selPos2)+30,'plane_full_tex_blue');
-          entities[entityCount].scale.setTo(-1,1);
           entities[entityCount].anchor.setTo(0.5);
+          entities[entityCount].scale.setTo(-1,1);
           entities[entityCount].manOnBoard = 1;
           flyGroup.add( entities[entityCount] );
           entityIsAlive[entityCount] = true;
-          this.firePlane(entityCount,true);
+        
         }
         if(selectedEntity2==8){
           entities[entityCount] = this.game.add.sprite(gameFieldX+61*13+30,gameFieldY+(61*selPos2)+30,'tank2_tex_blue');
           var ride = entities[entityCount].animations.add('ride');
-          entities[entityCount].scale.setTo(-1,1);
           entities[entityCount].animations.play('ride',10,true);
           entities[entityCount].anchor.setTo(0.5);
           entityGroup.add( entities[entityCount] );
@@ -972,7 +982,6 @@ TankGame.Game.prototype = {
         if(selectedEntity2==9){
           entities[entityCount] = this.game.add.sprite(gameFieldX+61*13+30,gameFieldY+(61*selPos2)+30,'heli_tex_blue');
           var ride = entities[entityCount].animations.add('helifly');
-          entities[entityCount].scale.setTo(-1,1);
           entities[entityCount].animations.play('helifly',20,true);
           entities[entityCount].anchor.setTo(0.5);
           flyGroup.add( entities[entityCount] );
@@ -983,6 +992,8 @@ TankGame.Game.prototype = {
         entities[entityCount].health = lives[selectedEntity2];
         entities[entityCount].team = 2;
         entities[entityCount].kind = selectedEntity2;
+
+        if( selectedEntity2==7 ) this.firePlane(entityCount,true);
         selectedEntity2 = entityCount;
 
       }
@@ -1003,6 +1014,8 @@ TankGame.Game.prototype = {
         entities[entityCount].mainDir = -1;
       else
         entities[entityCount].mainDir = 0;
+
+      this.getScale(entityCount);
 
       if(entities[entityCount].kind == 4) {
         entities[entityCount].boat = entities[entityCount].addChild( this.game.add.sprite(0 , 0,'boat_front') );
@@ -1193,7 +1206,9 @@ TankGame.Game.prototype = {
     var stepX = entitySpeeds[ entities[N].kind ];
     var stepY = entitySpeeds[ entities[N].kind ];
     if( entities[N].team==2 ) stepX*=-1;
-
+    if( regime[ entities[N].team ][ entities[N].kind ]==1 ) {
+      stepX*=-1;
+    }
     if( entities[N].kind == 4 ) return this.getMinecatStep(N);
     if( entities[N].kind == 7 ) return this.getPlaneStep(N);
     if( entities[N].kind == 9 ) return this.getHeliStep(N);
@@ -1429,7 +1444,9 @@ TankGame.Game.prototype = {
 
     for(var i = 0; i<affected.length; i++){
       if( mines[ N ].team != entities[ affected[i] ].team && !entities[i].flying ){
-        entities[ affected[i] ].health -= minePower;
+        var dist = getDistance( mines[N].x, mines[N].y, entities[affected[i]].x, entities[affected[i]].y) - bodyRadius[entities[affected[i]].kind];
+        entities[ affected[i] ].health -= (minePower * (1.0-(dist/mineBombRadius)) );
+        console.log(minePower+" * (1.0 - ("+dist+"/"+mineBombRadius+"))");
         this.redrawHealthBar(affected[i]);
         if( entities[ affected[i] ].health<=0 ) this.killEntity( affected[i] );
       }
@@ -1572,6 +1589,8 @@ TankGame.Game.prototype = {
   },
 
   redrawHealthBar: function(N){
+    if( !entityIsAlive[N] || N<entityStart) return;
+    console.log(N);
     entities[N].healthBar.width = (entities[N].health*40)/lives[ entities[N].kind ];
     entities[N].healthBarBg.visible = ( entities[N].health < lives[ entities[N].kind ] );
   },
@@ -1592,7 +1611,7 @@ TankGame.Game.prototype = {
       if( i!=N && entities[i].team!=entities[N].team && ( getDistanceEntities( N, i ) - bodyRadius[entities[i].kind] ) < shootRadius[entities[N].kind ] ){
         entities[N].targ = i;
         
-        if( entities[N].team==2 && entities[N].kind!=3  && entities[N].kind!=7 ) entities[N].scale.setTo(1,1);
+        if( entities[N].kind!=3  && entities[N].kind!=7 ) entities[N].scale.setTo(1,1);
         
         if( entities[N].kind==1 ){
           if( entities[N].team==1 ) 
@@ -1723,7 +1742,7 @@ TankGame.Game.prototype = {
       if( entityIsAlive[x] ){
 
         entityIsAlive[x] = false;
-        
+           
 
         if(entities[x].team==2){
           money1+=reward[entities[x].kind];
@@ -1771,6 +1790,10 @@ TankGame.Game.prototype = {
     entities[i].targ = -1;
     if( entities[i].kind == 9 ) entities[i].dest = -1;
     entities[i].rotation = 0;
+
+    this.getScale(i);
+
+
     if(entities[i].team == 1){
       if(entities[i].kind == 1){
         entities[i].loadTexture('gunman_walk', [0,1], false);
@@ -1785,8 +1808,7 @@ TankGame.Game.prototype = {
         entities[i].animations.paused = false;
       }
     } else {
-      if( entities[i].kind!=3 && entities[i].kind!=7 ) entities[i].scale.setTo(-1,1);
-
+      
       if(entities[i].kind == 1){
         entities[i].loadTexture('gunman_walk_blue', [0,1], false);
         entities[i].animations.add('walko');
@@ -1892,8 +1914,8 @@ TankGame.Game.prototype = {
         }, this);
 
         
-        var lastAlive = 0;
-        for(var i = 0; i<entityCount; i+=0){
+        var lastAlive = entityStart;
+        for(var i = entityStart; i<entityCount; i+=0){
           if(!entityIsAlive[i]) {
             i = entities[i].nextAlive;
             continue;
@@ -1903,8 +1925,9 @@ TankGame.Game.prototype = {
 
           var attackOnAir = ( entities[i].kind!=7 && entities[i].kind!=9 );
 
-          if( i!=x && attackOnAir && entities[i].team!=entities[x].team && getDistance(entities[x].x, entities[x].y, entities[i].x, entities[i].y) < bodyRadius[ entities[i].kind ]+25 ){
-            entities[i].health -= planePower;
+          if( i!=x && attackOnAir && entities[i].team!=entities[x].team && getDistance(entities[x].x, entities[x].y, entities[i].x, entities[i].y) < bodyRadius[ entities[i].kind ]+planeRadius ){
+            var dist = Math.max(0,getDistance( entities[x].x, entities[x].y, entities[i].x, entities[i].y ) );
+            entities[i].health -= planePower * (1.0 - (dist/(planeRadius+bodyRadius[ entities[i].kind ])) );
             this.redrawHealthBar(i);
             if(entities[i].health<=0) 
               this.killEntity( i );
@@ -1956,7 +1979,7 @@ TankGame.Game.prototype = {
             entities[entityCount] = this.game.add.sprite(entities[i].x,entities[i].y,'gunman_walk_blue');
             var walk = entities[entityCount].animations.add('walk');
             entities[entityCount].animations.play('walk',7,true);
-            entities[entityCount].scale.setTo(-1,1);
+  
             entities[entityCount].anchor.setTo(0.5);
             entityGroup.add( entities[entityCount] );
 
@@ -1972,6 +1995,7 @@ TankGame.Game.prototype = {
           entities[entityCount].dirc = 1;
 
           entityIsAlive[entityCount] = true;
+          this.getScale(entityCount);
 
           entities[entityCount].healthBarBg = this.game.add.sprite( entities[entityCount].x , entities[entityCount].y,'healthbarbg');
           entities[entityCount].healthBarBg.anchor.setTo(0.5);
@@ -2141,6 +2165,21 @@ TankGame.Game.prototype = {
 
   setKeys: function(){
 
+    var zKey = this.game.input.keyboard.addKey(Phaser.Keyboard.Z);
+    zKey.onDown.add(function(){
+      regimePressed[1] = true;
+    });
+    zKey.onUp.add(function(){
+      regimePressed[1] = false;
+    });
+
+    var pointNumpadKey = this.game.input.keyboard.addKey(Phaser.Keyboard.NUMPAD_DECIMAL);
+    pointNumpadKey.onDown.add(function(){
+      regimePressed[2] = true;
+    });
+    pointNumpadKey.onUp.add(function(){
+      regimePressed[2] = false;
+    });
 
     var qKey = this.game.input.keyboard.addKey(Phaser.Keyboard.Q);
     qKey.onDown.add(function(){
@@ -2160,6 +2199,9 @@ TankGame.Game.prototype = {
 
     var oneKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ONE);
     oneKey.onDown.add(function(){
+      if( regimePressed[1] ){
+        this.nextRegime(1,1);
+      } else 
       if(money1>=cost[1] && !dirSelection1){
         selectedEntity1=1;
         this.buy(1);
@@ -2168,6 +2210,9 @@ TankGame.Game.prototype = {
 
     var twoKey = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
     twoKey.onDown.add(function(){
+      if( regimePressed[1] ){
+        this.nextRegime(1,2);
+      } else
       if(money1>=cost[2] && !dirSelection1){
         selectedEntity1=2;
         this.buy(1);
@@ -2176,6 +2221,9 @@ TankGame.Game.prototype = {
 
     var threeKey = this.game.input.keyboard.addKey(Phaser.Keyboard.THREE);
     threeKey.onDown.add(function(){
+      if( regimePressed[1] ){
+        this.nextRegime(1,3);
+      } else 
       if(money1>=cost[3] && !dirSelection1){
         selectedEntity1=3;
         this.buy(1);
@@ -2184,6 +2232,9 @@ TankGame.Game.prototype = {
 
     var fourKey = this.game.input.keyboard.addKey(Phaser.Keyboard.FOUR);
     fourKey.onDown.add(function(){
+      if( regimePressed[1] ){
+        this.nextRegime(1,4);
+      } else 
       if(money1>=cost[4] && !dirSelection1){
         selectedEntity1=4;
         this.buy(1);
@@ -2192,6 +2243,9 @@ TankGame.Game.prototype = {
 
     var fiveKey = this.game.input.keyboard.addKey(Phaser.Keyboard.FIVE);
     fiveKey.onDown.add(function(){
+      if( regimePressed[1] ){
+        this.nextRegime(1,5);
+      } else 
       if(money1>=cost[5] && !dirSelection1){
         selectedEntity1=5;
         this.buy(1);
@@ -2200,6 +2254,9 @@ TankGame.Game.prototype = {
 
     var sixKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SIX);
     sixKey.onDown.add(function(){
+      if( regimePressed[1] ){
+        this.nextRegime(1,6);
+      } else 
       if(money1>=cost[6] && !dirSelection1){
         selectedEntity1=6;
         this.buy(1);
@@ -2220,6 +2277,9 @@ TankGame.Game.prototype = {
 
     var eightKey = this.game.input.keyboard.addKey(Phaser.Keyboard.EIGHT);
     eightKey.onDown.add(function(){
+      if( regimePressed[1] ){
+        this.nextRegime(1,8);
+      } else 
       if(money1>=cost[8] && !dirSelection1){
         selectedEntity1=8;
         this.buy(1);
@@ -2228,6 +2288,9 @@ TankGame.Game.prototype = {
 
     var nineKey = this.game.input.keyboard.addKey(Phaser.Keyboard.NINE);
     nineKey.onDown.add(function(){
+      if( regimePressed[1] ){
+        this.nextRegime(1,9);
+      } else 
       if(money1>=cost[9] && !dirSelection1){
         selectedEntity1=9;
         this.buy(1);
@@ -2237,6 +2300,9 @@ TankGame.Game.prototype = {
 
     var oneKeyNumpad = this.game.input.keyboard.addKey(Phaser.Keyboard.NUMPAD_1);
     oneKeyNumpad.onDown.add(function(){
+      if( regimePressed[2] ){
+        this.nextRegime(2,1);
+      } else 
       if(money2>=cost[1] && !dirSelection2){
         selectedEntity2=1;
         this.buy(2);
@@ -2245,6 +2311,9 @@ TankGame.Game.prototype = {
 
     var twoKeyNumpad = this.game.input.keyboard.addKey(Phaser.Keyboard.NUMPAD_2);
     twoKeyNumpad.onDown.add(function(){
+      if( regimePressed[2] ){
+        this.nextRegime(2,2);
+      } else 
       if(money2>=cost[2] && !dirSelection2){
         selectedEntity2=2;
         this.buy(2);
@@ -2253,6 +2322,9 @@ TankGame.Game.prototype = {
 
     var threeKeyNumpad = this.game.input.keyboard.addKey(Phaser.Keyboard.NUMPAD_3);
     threeKeyNumpad.onDown.add(function(){
+      if( regimePressed[2] ){
+        this.nextRegime(2,3);
+      } else 
       if(money2>=cost[3] && !dirSelection2){
         selectedEntity2=3;
         this.buy(2);
@@ -2261,6 +2333,9 @@ TankGame.Game.prototype = {
 
     var fourKeyNumpad = this.game.input.keyboard.addKey(Phaser.Keyboard.NUMPAD_4);
     fourKeyNumpad.onDown.add(function(){
+      if( regimePressed[2] ){
+        this.nextRegime(2,4);
+      } else 
       if(money2>=cost[4] && !dirSelection2){
         selectedEntity2=4;
         this.buy(2);
@@ -2269,6 +2344,9 @@ TankGame.Game.prototype = {
 
     var fiveKeyNumpad = this.game.input.keyboard.addKey(Phaser.Keyboard.NUMPAD_5);
     fiveKeyNumpad.onDown.add(function(){
+      if( regimePressed[2] ){
+        this.nextRegime(2,5);
+      } else 
       if(money2>=cost[5] && !dirSelection2){
         selectedEntity2=5;
         this.buy(2);
@@ -2277,6 +2355,9 @@ TankGame.Game.prototype = {
 
     var sixKeyNumpad = this.game.input.keyboard.addKey(Phaser.Keyboard.NUMPAD_6);
     sixKeyNumpad.onDown.add(function(){
+      if( regimePressed[2] ){
+        this.nextRegime(2,6);
+      } else 
       if(money2>=cost[6] && !dirSelection2){
         selectedEntity2=6;
         this.buy(2);
@@ -2297,6 +2378,9 @@ TankGame.Game.prototype = {
 
     var eightKeyNumpad = this.game.input.keyboard.addKey(Phaser.Keyboard.NUMPAD_8);
     eightKeyNumpad.onDown.add(function(){
+      if( regimePressed[2] ){
+        this.nextRegime(2,8);
+      } else 
       if(money2>=cost[8] && !dirSelection2){
         selectedEntity2=8;
         this.buy(2);
@@ -2305,6 +2389,9 @@ TankGame.Game.prototype = {
 
     var nineKeyNumpad = this.game.input.keyboard.addKey(Phaser.Keyboard.NUMPAD_9);
     nineKeyNumpad.onDown.add(function(){
+      if( regimePressed[2] ){
+        this.nextRegime(2,9);
+      } else 
       if(money2>=cost[9] && !dirSelection2){
         selectedEntity2=9;
         this.buy(2);
@@ -2416,6 +2503,45 @@ TankGame.Game.prototype = {
       }
 
     }, this);
+  },
+
+  nextRegime: function(t,k){
+    regime[t][k] = (regime[t][k]+1)%regimeCount;
+
+    if( t==1 ){
+      if( regime[t][k]==0 )
+        cards1[k].icon.loadTexture('fightIcon');
+      if( regime[t][k]==1 )
+        cards1[k].icon.loadTexture('defenceIcon');
+    } else {
+      if( regime[t][k]==0 )
+        cards2[k].icon.loadTexture('fightIcon');
+      if( regime[t][k]==1 )
+        cards2[k].icon.loadTexture('defenceIcon');
+    }
+    
+    lastAlive = entityStart;
+    for(var i = entityStart; i<entityCount; i+=0){
+      if(!entityIsAlive[i]) {
+        i = entities[i].nextAlive;
+        continue;
+      }
+      if( lastAlive!=i ) entities[lastAlive].nextAlive = i;
+      lastAlive = i;
+
+      this.getScale(i);
+      
+      i = entities[i].nextAlive;
+    }
+  },
+
+  getScale: function(N){
+    if( entities[N].kind==7 || (entities[N].kind!=3 && entities[N].targ>-1) ) return;
+    hScale = 1;
+    if( entities[N].team==2 ) hScale *= -1;
+    if( regime[ entities[N].team ][ entities[N].kind ]==1 && entities[N].kind!=4 && entities[N].kind!=9 ) 
+      hScale *= -1;
+    entities[N].scale.setTo(hScale,1);
   },
 
   prepareNewGame: function(){
