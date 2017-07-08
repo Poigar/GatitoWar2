@@ -9,15 +9,15 @@ var biome;
 var normalSpaces = 15*10;
 
 var maxObstacles = 20;
-var maxSeas = 4;
-var maxSeaSize = 100;
+var maxSeas = 3;
+var maxSeaSize = 90;
 var seaEntities=[];
 var seaAmount = 0;
 
 var bridges = [];
 var bridgeCount = 0;
 
-var defaultMoney = 200;
+var defaultMoney = 10000000;
 var money1 = defaultMoney, money2 = defaultMoney;
 
 var gameIsOver = false;
@@ -32,6 +32,9 @@ var cards2 = [];
 
 var obstacles = [];
 var obstacleCount = 0;
+
+var fncPressed1 = false;
+var fncPressed2 = false;
 
 var map = [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -371,7 +374,7 @@ TankGame.Game.prototype = {
 
         {
           var amountOfSeas = rnd(1,maxSeas);
-          var thisSeaSize = rnd(8, maxSeaSize);
+          var thisSeaSize = rnd(6, maxSeaSize);
           var sar = [];
           var sarPos = 0;
           for(var i = 0; i<amountOfSeas; i++){
@@ -384,20 +387,18 @@ TankGame.Game.prototype = {
             var sis = sar[sarPos];
             sarPos++;
 
-            if( sis.x<2 || sis.x>11 || sis.y<0 || sis.y>9 ) continue;
+            if( sis.x<2 || sis.x>12 || sis.y<0 || sis.y>9 ) continue;
             if(map[sis.y][sis.x]!=0) continue;
             
             map[ sis.y ][ sis.x ] = -2;
 
-            if( biome!=5 ){
-              seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*sis.x, gameFieldY + 61*sis.y,'water');
-              backgroundGroup.add( seaEntities[ seaAmount ] );
-            } else {
+            if( biome==5 ){
               seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*sis.x, gameFieldY + 61*sis.y,'pathway');
-              seaEntities[ seaAmount ].building = this.add.sprite( gameFieldX + 61*sis.x, gameFieldY + 61*sis.y,'town'+rnd(1,14));
               backgroundGroup.add( seaEntities[ seaAmount ] );
-              overBgGroup.add( seaEntities[ seaAmount ].building );
+              seaAmount++;
             }
+            seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*sis.x, gameFieldY + 61*sis.y,'water');
+            overBgGroup.add( seaEntities[ seaAmount ] );
             
             normalSpaces--;
             seaAmount++;
@@ -413,11 +414,13 @@ TankGame.Game.prototype = {
           for(var i = 0; i<10; i++){
             for(var j = 0; j<14; j++){
               if( (map[i][j]==-1 || map[i][j]==-2) && (map[i][j+1]==-1 || map[i][j+1]==-2) ){
-                if(biome==5)
+                if(biome==5){
                   seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j + 30, gameFieldY + 61*i,'pathway');
-                else
-                  seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j + 30, gameFieldY + 61*i,'water');
-                backgroundGroup.add( seaEntities[ seaAmount ] );
+                  backgroundGroup.add( seaEntities[ seaAmount ] );
+                  seaAmount++;
+                }
+                seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j + 30, gameFieldY + 61*i,'water');
+                overBgGroup.add( seaEntities[ seaAmount ] );
                 seaAmount++;
               }
             }
@@ -425,11 +428,13 @@ TankGame.Game.prototype = {
           for(var i = 0; i<9; i++){
             for(var j = 0; j<15; j++){
               if( (map[i][j]==-1 || map[i][j]==-2) && (map[i+1][j]==-1 || map[i+1][j]==-2) ){
-                if(biome==5)
-                  seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j, gameFieldY + 61*i + 30,'pathway');
-                else
-                  seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j, gameFieldY + 61*i + 30,'water');
-                backgroundGroup.add( seaEntities[ seaAmount ] );
+                if(biome==5){
+                  seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j, gameFieldY + 61*i+30,'pathway');
+                  backgroundGroup.add( seaEntities[ seaAmount ] );
+                  seaAmount++;
+                }
+                seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j, gameFieldY + 61*i+30,'water');
+                overBgGroup.add( seaEntities[ seaAmount ] );
                 seaAmount++;
               }
             }
@@ -437,11 +442,13 @@ TankGame.Game.prototype = {
           for(var i = 0; i<9; i++){
             for(var j = 0; j<14; j++){
               if( (map[i][j]==-1 || map[i][j]==-2) && (map[i+1][j]==-1 || map[i+1][j]==-2)  && (map[i][j+1]==-1 || map[i][j+1]==-2)  && (map[i+1][j+1]==-1 || map[i+1][j+1]==-2) ){
-                if(biome==5)
-                  seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j + 30, gameFieldY + 61*i + 30,'pathway');
-                else
-                  seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j + 30, gameFieldY + 61*i + 30,'water');
-                backgroundGroup.add( seaEntities[ seaAmount ] );
+                if(biome==5){
+                  seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j + 30, gameFieldY + 61*i+30,'pathway');
+                  backgroundGroup.add( seaEntities[ seaAmount ] );
+                  seaAmount++;
+                }
+                seaEntities[ seaAmount ] = this.add.sprite( gameFieldX + 61*j + 30, gameFieldY + 61*i+30,'water');
+                overBgGroup.add( seaEntities[ seaAmount ] );
                 seaAmount++;
               }
             }
@@ -470,7 +477,7 @@ TankGame.Game.prototype = {
           }
 
 
-        if( rnd(1,4)==1 ) this.generateBridge( rnd(2,12), rnd(0,9) );
+        if( rnd(1,3)==1 ) this.generateBridge( rnd(2,12), rnd(0,9) );
         
         var connected = false;
 
@@ -508,7 +515,7 @@ TankGame.Game.prototype = {
           }
 
           if( !connected ){
-            var bridgesss = rnd(1,3);
+            var bridgesss = rnd(1,2);
             for(var i = 0; i<bridgesss; i++) this.generateBridge( rnd(2,12), rnd(0,9) );
           }
         }
@@ -726,6 +733,9 @@ TankGame.Game.prototype = {
         if( lastAlive!=i ) entities[lastAlive].nextAlive = i;
         lastAlive = i;
 
+        entities[i].healthBarBg.x = entities[i].x;
+        entities[i].healthBarBg.y = entities[i].y-20;
+
         //iekaapis pakaa
         this.pickPack(i, this.collidePack( entities[i].x, entities[i].y, bodyRadius[ entities[i].kind ] ) );
 
@@ -841,10 +851,12 @@ TankGame.Game.prototype = {
         
         }
         if(selectedEntity1==7){
-          entities[entityCount] = this.game.add.sprite(gameFieldX+61+30,gameFieldY+(61*selPos1)+30,'plane_tex');
+          entities[entityCount] = this.game.add.sprite(gameFieldX+61+30,gameFieldY+(61*selPos1)+30,'plane_full_tex');
           entities[entityCount].anchor.setTo(0.5);
+          entities[entityCount].manOnBoard = 1;
           flyGroup.add( entities[entityCount] );
           entityIsAlive[entityCount] = true;
+
           this.firePlane(entityCount,true);
         }
         if(selectedEntity1==8){
@@ -941,9 +953,10 @@ TankGame.Game.prototype = {
           entityGroup.add( entities[entityCount] );
         }
         if(selectedEntity2==7){
-          entities[entityCount] = this.game.add.sprite(gameFieldX+61*13+30,gameFieldY+(61*selPos2)+30,'plane_tex_blue');
+          entities[entityCount] = this.game.add.sprite(gameFieldX+61*13+30,gameFieldY+(61*selPos2)+30,'plane_full_tex_blue');
           entities[entityCount].scale.setTo(-1,1);
           entities[entityCount].anchor.setTo(0.5);
+          entities[entityCount].manOnBoard = 1;
           flyGroup.add( entities[entityCount] );
           entityIsAlive[entityCount] = true;
           this.firePlane(entityCount,true);
@@ -990,6 +1003,22 @@ TankGame.Game.prototype = {
         entities[entityCount].mainDir = -1;
       else
         entities[entityCount].mainDir = 0;
+
+      if(entities[entityCount].kind == 4) {
+        entities[entityCount].boat = entities[entityCount].addChild( this.game.add.sprite(0 , 0,'boat_front') );
+        entities[entityCount].boat.anchor.setTo(0.5);
+        entities[entityCount].boat.visible = false;
+      }
+
+      entities[entityCount].healthBarBg = this.game.add.sprite( entities[entityCount].x , entities[entityCount].y,'healthbarbg');
+      entities[entityCount].healthBarBg.anchor.setTo(0.5);
+      entities[entityCount].healthBarBg.y-=20;
+
+      entities[entityCount].healthBar = entities[entityCount].healthBarBg.addChild( this.game.add.sprite(0 , 0,'healthbar') );
+      entities[entityCount].healthBar.x-=20;
+      entities[entityCount].healthBar.y-=2;
+
+      entities[entityCount].healthBarBg.visible = false;
 
       entityCount++;
 
@@ -1137,6 +1166,7 @@ TankGame.Game.prototype = {
     var ret = false;
 
     if( x-r<gameFieldX || x+r>gameFieldX+(61*15) || y-r<gameFieldY || y+r>gameFieldY+(61*10) ) return true;
+
 
     var lastAlive = 0;
     for(var i = 0; i<entityCount; i+=0){
@@ -1314,6 +1344,17 @@ TankGame.Game.prototype = {
 
     if(it%50) this.putMine( entities[N].x, entities[N].y, entities[N].team );
 
+    if( map[ coordToCellY( entities[N].y+bodyRadius[4] ) ][ coordToCellX( entities[N].x ) ]==-1 ||
+        map[ coordToCellY( entities[N].y+bodyRadius[4] ) ][ coordToCellX( entities[N].x ) ]==-2 ){
+      entities[N].boat.visible = true;
+
+      if( entities[N].mainDir==1 || entities[N].littleMove>0 ){
+        entities[N].boat.loadTexture('boat_side');
+      } else {
+        entities[N].boat.loadTexture('boat_front');
+      }
+    } else entities[N].boat.visible = false;
+
     var spX = entitySpeeds[entities[N].kind];
     if( entities[N].team == 2 ) spX = spX * (-1);
 
@@ -1367,7 +1408,10 @@ TankGame.Game.prototype = {
 
   putMine: function(x,y,t){
     if( this.collideMine(x,y,mineRadius+30) == -1 ){
-      mines[ mineCount ] = this.game.add.sprite( x,  y, 'mine');
+      if( biome!=5 && ( map[ coordToCellY(y) ][ coordToCellX(x) ]==-1 || map[ coordToCellY(y) ][ coordToCellX(x) ]==-2 ) )
+        mines[ mineCount ] = this.game.add.sprite( x,  y, 'watermine');
+      else
+        mines[ mineCount ] = this.game.add.sprite( x,  y, 'mine');
       mineGroup.add( mines[mineCount] );
       mines[ mineCount ].anchor.setTo(0.5);
       mines[ mineCount ].team = t;
@@ -1386,6 +1430,7 @@ TankGame.Game.prototype = {
     for(var i = 0; i<affected.length; i++){
       if( mines[ N ].team != entities[ affected[i] ].team && !entities[i].flying ){
         entities[ affected[i] ].health -= minePower;
+        this.redrawHealthBar(affected[i]);
         if( entities[ affected[i] ].health<=0 ) this.killEntity( affected[i] );
       }
     }
@@ -1442,18 +1487,25 @@ TankGame.Game.prototype = {
 
         if( entities[player].dirc == 1 ){
           this.game.add.tween( entities[player] ).to( { angle: 0 }, 500, "Linear", true);
+          //this.game.add.tween( entities[player].healthBarBg ).to( { angle: 0 }, 500, "Linear", true);
         }
         if( entities[player].dirc == 0 ){
-          if( entities[player].team == 1 )
+          if( entities[player].team == 1 ){
             this.game.add.tween( entities[player] ).to( { angle: -90 }, 500, "Linear", true);
-          else
+            //this.game.add.tween( entities[player].healthBarBg ).to( { angle: 90 }, 500, "Linear", true);
+          }else{
             this.game.add.tween( entities[player] ).to( { angle: 90 }, 500, "Linear", true);
+            //this.game.add.tween( entities[player].healthBarBg ).to( { angle: -90 }, 500, "Linear", true);
+          }
         }
         if( entities[player].dirc == 2 ){
-          if( entities[player].team == 1 )
+          if( entities[player].team == 1 ){
             this.game.add.tween( entities[player] ).to( { angle: 90 }, 500, "Linear", true); 
-          else 
+            //this.game.add.tween( entities[player].healthBarBg ).to( { angle: -90 }, 500, "Linear", true);
+          }else{ 
             this.game.add.tween( entities[player] ).to( { angle: -90 }, 500, "Linear", true); 
+            //this.game.add.tween( entities[player].healthBarBg ).to( { angle: 90 }, 500, "Linear", true);
+          }
         }
       }
   },
@@ -1472,7 +1524,7 @@ TankGame.Game.prototype = {
         if(type==6) type = 1;
 
         packs[packCount] = this.game.add.sprite( packX, packY, 'pack'+type );
-        backgroundGroup.add(packs[packCount]);
+        mineGroup.add(packs[packCount]);
         packs[packCount].anchor.setTo(0.5);
         packs[packCount].scale.setTo(0.6);
         packs[packCount].type = type;
@@ -1490,6 +1542,7 @@ TankGame.Game.prototype = {
     if( packs[N].type == 1 ){
 
       entities[player].health = lives[ entities[player].kind ];
+      this.redrawHealthBar(player);
 
     } else if(packs[N].type == 2){
 
@@ -1516,6 +1569,11 @@ TankGame.Game.prototype = {
 
     packs[N].destroy();
     packIsAlive[N] = false;
+  },
+
+  redrawHealthBar: function(N){
+    entities[N].healthBar.width = (entities[N].health*40)/lives[ entities[N].kind ];
+    entities[N].healthBarBg.visible = ( entities[N].health < lives[ entities[N].kind ] );
   },
 
   findTarget: function(N){
@@ -1643,6 +1701,7 @@ TankGame.Game.prototype = {
 
           } else {
             entities[y].health -= shootPower[ entities[x].kind ];
+            this.redrawHealthBar(y);
             if( entities[y].health <=0 ){
               this.killEntity(y);
             }
@@ -1701,6 +1760,7 @@ TankGame.Game.prototype = {
 
         }
 
+        entities[x].healthBarBg.destroy();
         entities[x].destroy();
         
       }
@@ -1845,6 +1905,7 @@ TankGame.Game.prototype = {
 
           if( i!=x && attackOnAir && entities[i].team!=entities[x].team && getDistance(entities[x].x, entities[x].y, entities[i].x, entities[i].y) < bodyRadius[ entities[i].kind ]+25 ){
             entities[i].health -= planePower;
+            this.redrawHealthBar(i);
             if(entities[i].health<=0) 
               this.killEntity( i );
           }
@@ -1860,6 +1921,78 @@ TankGame.Game.prototype = {
           this.firePlane(x,false);
         }
       }, this);
+    }
+  },
+
+  landingOperation: function(k, t){
+    var lastAlive = 0;
+    for(var i = 0; i<entityCount; i+=0){
+      if(!entityIsAlive[i]) {
+        i = entities[i].nextAlive;
+        continue;
+      }
+      if( lastAlive!=i ) entities[lastAlive].nextAlive = i;
+      lastAlive = i;
+
+      if( entities[i].team == t && entities[i].kind == k ){
+        var notOnObstacle = true;
+        if( map[ coordToCellY( entities[i].y ) ][ coordToCellX( entities[i].x) ]<0 ) notOnObstacle = false;
+
+        if( entities[i].manOnBoard>0 && notOnObstacle && !this.collidePoint( entities[i].x, entities[i].y, bodyRadius[ 1 ] ) ){
+
+
+
+          entities[i].manOnBoard--;
+
+          if( t==1 ){
+            entities[entityCount] = this.game.add.sprite(entities[i].x,entities[i].y,'gunman_walk');
+            var walk = entities[entityCount].animations.add('walk');
+            entities[entityCount].animations.play('walk',7,true);
+            entities[entityCount].anchor.setTo(0.5);
+            entityGroup.add( entities[entityCount] );
+          
+            if( entities[i].kind==7 ) entities[i].loadTexture( 'plane_tex' );
+          } else {
+            entities[entityCount] = this.game.add.sprite(entities[i].x,entities[i].y,'gunman_walk_blue');
+            var walk = entities[entityCount].animations.add('walk');
+            entities[entityCount].animations.play('walk',7,true);
+            entities[entityCount].scale.setTo(-1,1);
+            entities[entityCount].anchor.setTo(0.5);
+            entityGroup.add( entities[entityCount] );
+
+            if( entities[i].kind==7 ) entities[i].loadTexture( 'plane_tex_blue' );
+          }
+
+          entities[entityCount].health = lives[1];
+          entities[entityCount].team = t;
+          entities[entityCount].kind = 1;
+          entities[entityCount].flying = false;
+
+          entities[entityCount].targ = -1;
+          entities[entityCount].dirc = 1;
+
+          entityIsAlive[entityCount] = true;
+
+          entities[entityCount].healthBarBg = this.game.add.sprite( entities[entityCount].x , entities[entityCount].y,'healthbarbg');
+          entities[entityCount].healthBarBg.anchor.setTo(0.5);
+          entities[entityCount].healthBarBg.y-=20;
+
+          entities[entityCount].healthBar = entities[entityCount].healthBarBg.addChild( this.game.add.sprite(0 , 0,'healthbar') );
+          entities[entityCount].healthBar.x-=20;
+          entities[entityCount].healthBar.y-=2;
+
+          entities[entityCount].healthBarBg.visible = false;
+
+          entities[entityCount].nextAlive = entityCount+1;
+
+          sound_place.play();
+          
+          entityCount++;
+
+        }
+      }
+
+      i = entities[i].nextAlive;
     }
   },
 
@@ -2007,6 +2140,24 @@ TankGame.Game.prototype = {
   
 
   setKeys: function(){
+
+
+    var qKey = this.game.input.keyboard.addKey(Phaser.Keyboard.Q);
+    qKey.onDown.add(function(){
+      fncPressed1 = true;
+    });
+    qKey.onUp.add(function(){
+      fncPressed1 = false;
+    });
+
+    var plusKeyNumpad = this.game.input.keyboard.addKey(Phaser.Keyboard.NUMPAD_ADD);
+    plusKeyNumpad.onDown.add(function(){
+      fncPressed2 = true;
+    });
+    plusKeyNumpad.onUp.add(function(){
+      fncPressed2 = false;
+    });
+
     var oneKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ONE);
     oneKey.onDown.add(function(){
       if(money1>=cost[1] && !dirSelection1){
@@ -2057,9 +2208,13 @@ TankGame.Game.prototype = {
 
     var sevenKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SEVEN);
     sevenKey.onDown.add(function(){
-      if(money1>=cost[7] && !dirSelection1){
-        selectedEntity1=7;
-        this.buy(1);
+      if(!dirSelection1){
+        if( fncPressed1 ){
+          this.landingOperation(7,1);
+        } else if(money1>=cost[7]){
+          selectedEntity1=7;
+          this.buy(1);
+        }
       }
     }, this);
 
@@ -2130,9 +2285,13 @@ TankGame.Game.prototype = {
 
     var sevenKeyNumpad = this.game.input.keyboard.addKey(Phaser.Keyboard.NUMPAD_7);
     sevenKeyNumpad.onDown.add(function(){
-      if(money2>=cost[7] && !dirSelection2){
-        selectedEntity2=7;
-        this.buy(2);
+      if(!dirSelection2){
+        if( fncPressed2 ){
+          this.landingOperation(7,2);
+        } else if(money2>=cost[7]){
+          selectedEntity2=7;
+          this.buy(2);
+        }
       }
     }, this);
 
@@ -2262,6 +2421,17 @@ TankGame.Game.prototype = {
   prepareNewGame: function(){
     entities = [];
     entityIsAlive = [];
+    packs = [];
+    packIsAlive = [];
+    packCount = 0;
+    mines = [];
+    minesIsAlive = [];
+    mineCount = 0;
+    seaEntities = [];
+    seaAmount = 0;
+  
+
+
     entityCount = 0;
     selPos1 = 0;
     selPos2 = 0;

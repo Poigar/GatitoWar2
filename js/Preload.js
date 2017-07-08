@@ -57,7 +57,9 @@ TankGame.Preload.prototype = {
     this.load.spritesheet('tank2_tex_blue', 'assets/images/tank2_blue.png', 60, 40, 2);
 
     this.load.image('plane_tex', 'assets/images/plane.png');
-    this.load.image('plane_tex_blue', 'assets/images/plane_blue.png');    
+    this.load.image('plane_tex_blue', 'assets/images/plane_blue.png');
+    this.load.image('plane_full_tex', 'assets/images/plane_full.png');
+    this.load.image('plane_full_tex_blue', 'assets/images/plane_blue_full.png');    
 
     this.load.spritesheet('pickup_tex', 'assets/images/pickup_green.png', 50, 30, 2);
     this.load.spritesheet('pickup_tex_blue', 'assets/images/pickup_blue.png', 50, 30, 2);
@@ -84,6 +86,7 @@ TankGame.Preload.prototype = {
 
     this.load.spritesheet('cat_walk', 'assets/images/cat.png', 30, 30, 2);
     this.load.spritesheet('angel', 'assets/images/angel.png', 40, 40);
+    
 
     //GUI
     this.load.image('play_btn', 'assets/images/play.png');
@@ -178,7 +181,14 @@ TankGame.Preload.prototype = {
     this.load.image('street', 'assets/images/street.png');
     this.load.image('pathway', 'assets/images/pathway.png');
 
+    this.load.image('boat_front', 'assets/images/boat_front.png');
+    this.load.image('boat_side', 'assets/images/boat_side.png');
+
+
     this.load.image('dir_choise', 'assets/images/mineBtn.png');
+
+    this.load.image('healthbarbg', 'assets/images/healthbarbg.png');
+    this.load.image('healthbar', 'assets/images/healthbar.png');
 
     //Sounds
     this.load.audio('gunshot', ['assets/audio/gunshot2.ogg', 'assets/audio/gunshot2.wav']);
@@ -199,6 +209,7 @@ TankGame.Preload.prototype = {
     this.load.spritesheet('explosion', 'assets/images/explosion.png', 60, 60, 8);
     this.load.image('bullet', 'assets/images/bullet.png');
     this.load.image('mine', 'assets/images/mine.png');
+    this.load.image('watermine', 'assets/images/watermine.png');
 
     this.load.image('pack1', 'assets/images/med.png');
     this.load.image('pack2', 'assets/images/lives.png');
