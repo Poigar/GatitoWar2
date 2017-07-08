@@ -143,6 +143,9 @@ TankGame.Preload.prototype = {
     this.load.image('card7', 'assets/images/card7.png');
     this.load.image('card8', 'assets/images/card8.png');
     this.load.image('card9', 'assets/images/card9.png');
+    
+    this.load.image('fightIcon', 'assets/images/fightIcon.png');
+    this.load.image('defenceIcon', 'assets/images/defenceIcon.png');
 
     //Map
     this.load.image('base', 'assets/images/base.png');
